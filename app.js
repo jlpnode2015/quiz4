@@ -46,6 +46,24 @@ app.use(function(req, res, next) {
   next();
 });
 
+app.use(function(req,res,next){
+    var ahora = new Date();
+
+        if(req.session.user){
+            if(req.session.user.time){
+                var sesion = new Date(req.session.user.time);
+                var diferencia = ahora - sesion;
+                        if(diferencia > 120000){ //si está 2 minutos inactivo se cierra sesión
+                            delete req.session.user;
+                            next();
+                            return;
+                        }
+            }
+            req.session.user.time= new Date(); //Reactivando el contador
+        }
+        next();
+});
+
 app.use('/', routes);
 
 // catch 404 and forward to error handler
